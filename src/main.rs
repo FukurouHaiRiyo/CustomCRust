@@ -46,9 +46,9 @@ fn format(format_str: &str, args: &[&dyn std::fmt::Debug]) -> String {
                         }
                     }
 
-                    'x' | 'X' => {
+                    'x' => {
                         if let Some(arg) = args.get(0) {
-                            result.push_str(&format!("{:x}", arg));
+                            result.push_str(&format!("{:?}", arg));
                         } else {
                             panic!("Insufficient arguments for format specifier %x or %X");
                         }
@@ -83,5 +83,5 @@ fn main() {
     std::io::stdin().read_line(&mut line).unwrap();
     let name = line.trim();
 
-    printf("%s", &[&name]);
+    printf("Your name: %s", &[&name]);
 }
