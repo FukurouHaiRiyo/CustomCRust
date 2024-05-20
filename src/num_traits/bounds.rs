@@ -118,7 +118,26 @@ fn wrapping_bound() {
         };
     }
 
-    test_wrapping_bounded!(usize u8 u16 u32 u64 isize i8 i16 i32 i64);
+    test_wrapping_bound!(usize u8 u16 u32 u64 isize i8 i16 i32 i64);
 }
 
+#[test]
+fn wrapping_bound_i128() -> {
+    macro_rules! test_wrapping_bound {
+        ($($t:ty)+) => {
+            $(
+                assert_eq!(<Wrapping<$t> as Bounded>::min_value().0, <$t>::min_value());
+                assert_eq!(<Wrapping<$t> as Bounded>::max_value().0, <$t>::max_value());
+            )+
+        };
+    }
 
+    test_wrapping_bound(u128 i128);
+}
+
+#[test]
+fn wrapping_is_bound() {
+    fn require_bounded<T: Bounded>(_: &T) {}
+    require_bounded(&Wrapping(42_u32));
+    require_bounded(&Wrapping(-42));
+}
