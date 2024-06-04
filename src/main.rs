@@ -5,5 +5,5 @@ use print::p::*;
 use math::c_func::*;
 
 fn main() {
-    println!("{}", atoi("- 123"));
+    println!("{}", atoi(" -123"));
 }
