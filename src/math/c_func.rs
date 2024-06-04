@@ -10,7 +10,7 @@ pub fn atoi(s: &str) -> i32 {
     let mut result = 0;
 
     // skip leading whitespaces
-    while i < len && ft_isspace(bytes[i] as chat) {
+    while i < len && ft_isspace(bytes[i] as char) {
         i += 1;
     }
 
@@ -24,4 +24,8 @@ pub fn atoi(s: &str) -> i32 {
     }
 
     sign * result
+}
+
+pub fn ft_bzero(s: char, n: usize) {
+    
 }

@@ -77,26 +77,6 @@ pub fn printf(format_str: &str, args: &[&dyn std::fmt::Debug]) {
     println!("{}", formatted_string);
 }
 
-pub fn scanf(format: &str) -> Result<Vec<String>, &'static str> {
-    let mut input = String::new();
-    io::stdin().read_line(&mut input).map_err(|_| "Failed to read line")?;
-    let input = input.trim();
-
-    // Split the format string by whitespace
-    let format_parts: Vec<&str> = format.split_whitespace().collect();
-
-    // Split the input string by whitespace
-    let input_parts: Vec<&str> = input.split_whitespace().collect();
-
-    if format_parts.len() != input_parts.len() {
-        return Err("Input does not match format");
-    }
-
-
-    let mut result = Vec::new();
-    for part in input_parts {
-        result.push(part.to_string());
-    }
-
-    Ok(result);
+pub fn scanf(format: &str){
+    
 }
