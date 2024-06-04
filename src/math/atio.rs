@@ -3,5 +3,5 @@ fn ft_isspace(c: char) -> bool {
 }
 
 pub fn atoi(s: &str) -> i32 {
-    
+    let bytes = s.as_bytes();
 }
