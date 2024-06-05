@@ -1,31 +1,67 @@
-fn ft_isspace(c: char) -> bool {
+use std::alloc::{alloc, Layout};
+use std::ptr;
+
+fn isspace(c: char) -> bool {
     c == '\t' || c == '\n' || c == '\x0b' || c == '\x0c' || c == '\r' || c == ' '
 }
 
+fn isalnum(c: char) -> bool {
+    (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || (c >= '0' && c <= '9')
+}
+
 pub fn atoi(s: &str) -> i32 {
-    let bytes = s.as_bytes();
-    let mut i = 0;
-    let len = bytes.len();
+    let mut chars = s.chars().peekable(); // Using peekable to handle leading whitespaces
     let mut sign = 1;
     let mut result = 0;
 
-    // skip leading whitespaces
-    while i < len && ft_isspace(bytes[i] as char) {
-        i += 1;
-    }
-
-    // check for sign
-    if i < len && (bytes[i] == b'-' || bytes[i] == b'+') {
-        if bytes[i] == b'-' {
-            sign = -1;
+    while let Some(&c) = chars.peek() {
+        if isspace(c) {
+            chars.next(); // Consume the whitespace character
+            continue;
         }
-
-        i += 1;
+        if c == '-' || c == '+' {
+            if c == '-' {
+                sign = -1;
+            }
+            chars.next(); // Consume the sign character
+            continue;
+        }
+        if c.is_digit(10) {
+            result = result * 10 + c.to_digit(10).unwrap() as i32;
+            chars.next(); // Consume the digit character
+        } else {
+            break;
+        }
     }
 
     sign * result
 }
 
-pub fn ft_bzero(s: char, n: usize) {
-    
+pub fn bzero(s: &mut [u8], mut n: usize) {
+    while n > 0 {
+        n -= 1;
+        s[n] = 0;
+    }
+}
+
+fn alloc(count: usize, size: usize) -> *mut u8 {
+    let (count, size) = if count == 0 || size == 0 {
+        (1, 1)
+    } else {
+        (count, size)
+    };
+
+    let total_size = count * size;
+    let layout = Layout::from_size_align(total_size, 1).expect("Failed to create layout");
+
+    let ret = unsafe {alloc(layout)};
+    if ret.is_null() {
+        return ptr::null_mut();
+    }
+
+    unsafe {
+        ptr::write_bytes(ret, 0, total_size);
+    }
+
+    ret
 }
