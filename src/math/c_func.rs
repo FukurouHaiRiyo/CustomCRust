@@ -8,19 +8,19 @@ fn isspace(c: char) -> bool {
     c == '\t' || c == '\n' || c == '\x0b' || c == '\x0c' || c == '\r' || c == ' '
 }
 
-fn isalnum(c: char) -> bool {
+pub fn is_alnum(c: char) -> bool {
     (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || (c >= '0' && c <= '9')
 }
 
-fn is_alpha(c: char) -> bool {
+pub fn is_alpha(c: char) -> bool {
     (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z')
 }
 
-fn is_ascii(c: i32) -> bool {
+pub fn is_ascii(c: i32) -> bool {
     c >= 0 && c<= 127
 }
 
-fn is_digit(c: char) -> bool {
+pub fn is_digit(c: char) -> bool {
     c >= '0' && c <= '9'
 }
 
