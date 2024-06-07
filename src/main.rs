@@ -1,10 +1,7 @@
-mod print;
-mod math;
+mod C;
 
-use print::p::*;
-use math::c_func::{atoi, itoa, is_digit};
-use math::abs::abs;
-use math::num_biguint::addition;
+use C::c_func::{atoi, itoa, is_digit, substr};
+use C::abs::abs;
 
 fn main() {
     println!("{}", atoi(" -123"));
@@ -12,6 +9,8 @@ fn main() {
     // println!("{:?}", itoa(-123));
     println!("{}", is_digit('1'));
 
-    let result = addition::add("123", "123");
-    println!("{}", result);
+    let s = "1234567890";
+    let result = substr(s, 4, 8);
+
+    println!("Result: {}", result);
 }

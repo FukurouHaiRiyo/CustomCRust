@@ -46,6 +46,29 @@ fn len_num(mut n: i32) -> usize {
     len
 }
 
+pub fn substr(s: &str, from: usize, to: usize) -> String {
+    if from > to || from < 1 {
+        return String::new();
+    }
+
+    let from_index = from - 1;
+    let to_index = if to > s.len() { s.len() } else { to };
+
+    let mut result = String::new();
+
+    if from_index < s.len() {
+        result.push_str(&s[from_index..to_index]);
+    }
+
+    if to > s.len() {
+        result.push_str(&" ".repeat(to - s.len()));
+    }
+
+    result
+}
+
+
+
 pub fn itoa(n: i32) -> Option<String> {
     let len = len_num(n);
     let mut ret = unsafe { all(Layout::array::<u8>(len + 1).unwrap()) } as *mut u8;
