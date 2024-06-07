@@ -1,71 +1,29 @@
-use super::{BigUint, IntDigits};
-use crate::big_digit::{self, BigDigit};
-use crate::UsizePromotion;
+pub fn add(num1: &str, num2: &str) -> String {
+    let mut result = String::new();
 
-use core::iter::Sum;
-use core::ops::{Add, AddAssign};
-use num_traits::CheckedAdd;
+    let (mut carry, mut i, mut j) = (0, num1.len() as isize - 1, num2.len() as isize - 1);
 
-// add with carry
-#[cfg(target_arch="x86_64")]
-#[inline]
-fn adc(carry: u8, a: u64, b: u64, out: &mut u64) -> u8 {
-    // Safety: There are absolutely no safety concerns with calling `_addcarry_u64`.
-    // It's just unsafe for API consistency with other intrinsics.
-    unsafe { 
-        core::arch::x86_64::_addcarry_u64(carry, a, b, out) 
-    }
-}
+    while i >= 0 || j >= 0 || carry > 0 {
+        let digit1 = if i >= 0 {
+            num1.chars().nth(i as usize).unwrap().to_digit(10).unwrap() as isize
+        } else {
+            0
+        };
 
-#[cfg(target_arch = "x86")]
-#[inline]
-fn adc(carry: u8, a: u32, b: u32, out: &mut u32) -> u8 {
-    // Safety: There are absolutely no safety concerns with calling `_addcarry_u32`.
-    // It's just unsafe for API consistency with other intrinsics.
-    unsafe { 
-        core::arch::x86::_addcarry_u32(carry, a, b, out) 
-    }
-}
+        let digit2 = if j >= 0 {
+            num2.chars().nth(j as usize).unwrap().to_digit(10).unwrap() as isize
+        } else {
+            0
+        };
 
-// fallback for environments where we don't have an addcarry intrinsic
-// (copied from the standard library's `carrying_add`)
-#[cfg(not(any(target_arch = "x86", target_arch = "x86_64")))]
-#[inline]
-fn adc(carry: u8, lhs: BigDigit, rhs: BigDigit, out: &mut BigDigit) -> u8 {
-    let (a, b) = lhs.overflowing_add(rhs);
-    let (c, d) = a.overflowing_add(carry as BigDigit);
-    *out = c;
-    u8::from(b || d)
-}
+        let sum = digit1 + digit2 + carry;
+        carry = sum / 10;
+        let digit = (sum % 10) as u8
+        result.insert(0, char::from_digit(digit as u32, 10).unwrap());
 
-/// Two argument addition of raw slices, `a += b`, returning the carry.
-///
-/// This is used when the data `Vec` might need to resize to push a non-zero carry, so we perform
-/// the addition first hoping that it will fit.
-///
-/// The caller _must_ ensure that `a` is at least as long as `b`.
-#[inline] 
-pub(super) fn __add2(a: &mut [BigDigit], b: &[BigDigit]) -> BigDigit {
-    debug_assert!(a.len() >= b.len());
-
-    let mut carry = 0;
-    let (a_lo, a_hi) = a.split_at_mut(b.len());
-
-
-    for (a, b) in a_lo.iter_mut().zip(b) {
-        carry = adc(carry, *a, *b, a);
+        i -= 1;
+        j -= 1;
     }
 
-    if carry != 0 {
-        for a in a_hi {
-            carry = adc(carry, *a, *b, a);
-            if carry == 0{
-                break;
-            }
-        }
-    }
-
-    carry as BigDigit
+    result
 }
-
-
