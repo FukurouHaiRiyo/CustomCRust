@@ -4,6 +4,37 @@ use crate::abs;
 use std::alloc::{alloc as all, Layout};
 use std::ptr;
 
+pub trait NameOf{
+    fn name_of(&self) -> &'static str;
+}
+
+impl NameOf for i32 {
+    fn name_of(&self) -> &'static str {
+        "i32"
+    }
+}
+impl NameOf for f64 {
+    fn name_of(&self) -> &'static str {
+        "f64"
+    }
+}
+impl NameOf for String {
+    fn name_of(&self) -> &'static str {
+        "String"
+    }
+}
+impl NameOf for char {
+    fn name_of(&self) -> &'static str {
+        "char"
+    }
+}
+
+impl<T> NameOf for &T where T: NameOf {
+    fn name_of(&self) -> &'static str {
+        (*self).name_of()
+    }
+}
+
 fn isspace(c: char) -> bool {
     c == '\t' || c == '\n' || c == '\x0b' || c == '\x0c' || c == '\r' || c == ' '
 }
