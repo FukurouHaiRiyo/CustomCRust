@@ -19,3 +19,11 @@ The ft_printf function should handle the following format specifiers:
 | %x | Prints a number in hexadecimal (base 16) lowercase format. |
 | %X |  Prints a number in hexadecimal (base 16) uppercase format. |
 | %% |  Prints a percent sign. |
+
+
+| Function             | What does it do                                                 |
+| ----------------- | ------------------------------------------------------------------ |
+| abs | Returns the absolute value of a number |
+| aliquot_sum | Calculates the sum of the proper divisors of a number. |
+| amicable_nums | Returns vec of amicable pairs below N. |
+| c_func | Implementations of different C functions like atoi, itoa, is_alnum etc. |
