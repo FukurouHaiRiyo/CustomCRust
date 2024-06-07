@@ -1,6 +1,6 @@
 mod C;
 
-use C::c_func::{atoi, itoa, is_digit, substr};
+use C::c_func::{atoi, is_digit, substr};
 use C::abs::abs;
 
 fn main() {
