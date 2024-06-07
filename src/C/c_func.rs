@@ -9,30 +9,37 @@ fn isspace(c: char) -> bool {
 }
 
 pub fn is_alnum(c: char) -> bool {
+    #![allow(unused_imports)]
     (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || (c >= '0' && c <= '9')
 }
 
 pub fn is_alpha(c: char) -> bool {
+    #![allow(unused_imports)]
     (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z')
 }
 
 pub fn is_ascii(c: i32) -> bool {
+    #![allow(unused_imports)]
     c >= 0 && c<= 127
 }
 
 pub fn is_digit(c: char) -> bool {
+    #![allow(unused_imports)]
     c >= '0' && c <= '9'
 }
 
 fn is_print(c: i32) -> bool {
+    #![allow(unused_imports)]
     c >= 32 && c <= 126
 }
 
 fn is_space(c: char) -> bool {
+    #![allow(unused_imports)]
     (c >= '\u{0009}' && c <= '\u{000D}') || c == ' '
 }
 
 fn len_num(mut n: i32) -> usize {
+    #![allow(unused_imports)]
     let mut len = 0;
     if n <= 0 {
         len += 1;
@@ -47,6 +54,7 @@ fn len_num(mut n: i32) -> usize {
 }
 
 pub fn substr(s: &str, from: usize, to: usize) -> String {
+    #![allow(unused_imports)]
     if from > to || from < 1 {
         return String::new();
     }
@@ -67,9 +75,19 @@ pub fn substr(s: &str, from: usize, to: usize) -> String {
     result
 }
 
+pub fn strcat(args: &[&dyn ToString]) -> String {
+    #![allow(unused_imports)]
+    let mut result = String::new();
+    for arg in args {
+        result.push_str(&arg.to_string());
+    }
 
+    result
+}
 
 pub fn itoa(n: i32) -> Option<String> {
+    #![allow(unused_imports)]
+
     let len = len_num(n);
     let mut ret = unsafe { all(Layout::array::<u8>(len + 1).unwrap()) } as *mut u8;
 
@@ -104,6 +122,7 @@ pub fn itoa(n: i32) -> Option<String> {
 }
 
 pub fn atoi(s: &str) -> i32 {
+    #![allow(unused_imports)]
     let mut chars = s.chars().peekable(); // Using peekable to handle leading whitespaces
     let mut sign = 1;
     let mut result = 0;
@@ -132,6 +151,7 @@ pub fn atoi(s: &str) -> i32 {
 }
 
 pub fn bzero(s: &mut [u8], mut n: usize) {
+    #![allow(unused_imports)]
     while n > 0 {
         n -= 1;
         s[n] = 0;
@@ -139,6 +159,7 @@ pub fn bzero(s: &mut [u8], mut n: usize) {
 }
 
 fn alloc(count: usize, size: usize) -> *mut u8 {
+    #![allow(unused_imports)]
     let (count, size) = if count == 0 || size == 0 {
         (1, 1)
     } else {
