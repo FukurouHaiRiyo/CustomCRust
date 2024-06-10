@@ -1,14 +1,15 @@
 mod C;
 
 use C::c_func::{atoi, is_digit, substr, strcat, NameOf, sublist};
-use C::math::abs;
+use C::math::{abs, sin};
+use C::listcat;
 
 fn main() {
     // test for atoi
     println!("{}", atoi(" -123"));
 
     // test for abs
-    println!("{}", abs(-2));
+    println!("Abs test: abs(-2): {}", abs(-2));
 
     // test for itoa
     // println!("{:?}", itoa(-123));
@@ -32,4 +33,13 @@ fn main() {
     // test for sublist
     let list = vec![1, 2, 3, 4, 5];
     println!("{:?}", sublist(&list, 2, 4));
+
+    // test for listcat
+    let list1 = vec![6, 7, 8];
+    let reuslt = listcat!(list, list1);
+    println!("{:?}", result);
+
+    // test for sin 
+    let angle: f64 = 1.0;
+    println!("sin({}) = {}", angle, sin(angle));
 }

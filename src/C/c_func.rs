@@ -4,6 +4,7 @@ use crate::C::math::abs;
 use std::alloc::{alloc as all, Layout};
 use std::ptr;
 
+
 pub trait NameOf{
     fn name_of(&self) -> &'static str;
 }
