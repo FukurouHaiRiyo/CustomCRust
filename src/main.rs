@@ -1,7 +1,7 @@
 mod C;
 
 use C::c_func::{atoi, is_digit, substr, strcat, NameOf, sublist, sort};
-use C::math::{abs, sin};
+use C::math::{abs, sin, floor, ceil, natural_log};
 use C::listcat;
 
 fn main() {
@@ -46,9 +46,15 @@ fn main() {
     */
 
     // test for sort
-    let mut numbers = vec![10, 6, 3, 2, 7, 5, 8, 9, 1, 4];
+    /* let mut numbers = vec![10, 6, 3, 2, 7, 5, 8, 9, 1, 4];
     println!("Array before sorting: {:?}", numbers);
     
     sort(&mut numbers);
-    println!("Array after sorting: {:?}", numbers);
+    println!("Array after sorting: {:?}", numbers);*/ 
+
+    // test for floor
+    let numbers = vec![3.7, -3.7, 4.0, -4.0, 0.0, -0.9];
+    for number in numbers {
+        println!("The floor of {} is {} and the ceil is {} and the log is {}", number, floor(number), ceil(number), natural_log(number));
+    }
 }
