@@ -21,22 +21,6 @@ pub fn tan(x: f64) -> f64 {
     x.tan()
 }
 
-pub fn asin(x: f64) -> f64 {
-    x.asin()
-}
-
-pub fn acos(x: f64) -> f64 {
-    x.acos()
-}
-
-pub fn atan(x: f64) -> f64 {
-    x.atan()
-}
-
-pub fn atan2(y: f64, x: f64) -> f64 {
-    y.atan2(x)
-}
-
 pub fn sqrt(x: f64) -> f64 {
     x.sqrt()
 }

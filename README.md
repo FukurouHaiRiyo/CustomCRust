@@ -21,9 +21,20 @@ The ft_printf function should handle the following format specifiers:
 | %% |  Prints a percent sign. |
 
 
+Also, the following functions were implemented: 
+
 | Function             | What does it do                                                 |
 | ----------------- | ------------------------------------------------------------------ |
 | abs | Returns the absolute value of a number |
 | aliquot_sum | Calculates the sum of the proper divisors of a number. |
 | amicable_nums | Returns vec of amicable pairs below N. |
 | c_func | Implementations of different C functions like atoi, itoa, is_alnum etc. |
+
+Math function:
+
+| Function             | What does it do                                                 |
+| ----------------- | ------------------------------------------------------------------ |
+| abs | Returns the absolute value of a number |
+| sin | This function takes angle (in radian) as an argument and returns its sine value that could be verified using sine curve |
+| cos | This function takes angle (in radians) as an argument and returns its cosine value that could be verified using cosine curve. |
+| tan | This function takes angle (in radians) as an argument and returns its tangent value. This could also be verified using Trigonometry as Tan(x) = Sin(x)/Cos(x). |
