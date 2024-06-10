@@ -239,3 +239,28 @@ pub fn sublist<T: Clone + Default>(list: &[T], from: usize, to:usize) -> Vec<T> 
 
     result
 }
+
+fn partition<T: Ord + Copy>(arr: &mut[T]) -> usize {
+    let pivot = arr[arr.len() - 1]; // taking the last element as pivot
+    let mut i = 0;
+
+    for j in 0..arr.len() - 1 {
+        if arr[j] <= pivot {
+            arr.swap(i, j); // swap elements less than or equal to pivot to the left
+            i += 1;
+        }
+    }
+
+    arr.swap(i, arr.len() - 1); // place pivot element to its correct position
+    i // return the pivot index
+}
+
+pub fn sort<T: Ord + Copy>(arr: &mut [T]) {
+    if arr.len() < 1 {
+        return;
+    }
+
+    let piv_idx = partition(arr);
+    sort(&mut arr[0..piv_idx]); // Sort the left part
+    sort(&mut arr[piv_idx + 1..]); // Sort the right part
+}

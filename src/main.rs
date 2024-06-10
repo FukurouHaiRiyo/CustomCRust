@@ -1,10 +1,11 @@
 mod C;
 
-use C::c_func::{atoi, is_digit, substr, strcat, NameOf, sublist};
+use C::c_func::{atoi, is_digit, substr, strcat, NameOf, sublist, sort};
 use C::math::{abs, sin};
 use C::listcat;
 
 fn main() {
+    /* 
     // test for atoi
     println!("{}", atoi(" -123"));
 
@@ -42,4 +43,12 @@ fn main() {
     // test for sin 
     let angle: f64 = 1.0;
     println!("sin({}) = {}", angle, sin(angle));
+    */
+
+    // test for sort
+    let mut numbers = vec![10, 6, 3, 2, 7, 5, 8, 9, 1, 4];
+    println!("Array before sorting: {:?}", numbers);
+    
+    sort(&mut numbers);
+    println!("Array after sorting: {:?}", numbers);
 }
