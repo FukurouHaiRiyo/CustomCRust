@@ -1,4 +1,4 @@
-use crate::abs;
+use crate::C::math::abs;
 
 
 use std::alloc::{alloc as all, Layout};
@@ -210,4 +210,31 @@ fn alloc(count: usize, size: usize) -> *mut u8 {
     }
 
     ret
+}
+
+pub fn sublist<T: Clone + Default>(list: &[T], from: usize, to:usize) -> Vec<T> {
+    if from > to || from < 1 {
+        return Vec::new();
+    }
+
+    let from_index = from - 1; // adjust for 0-based index
+    let to_index = if to > list.len() {
+        list.len()
+    } else {
+        to
+    };
+
+
+    let mut result = Vec::new();
+
+    if from_index < list.len() {
+        result.extend_from_slice(&list[from_index..to_index]);
+    }
+
+    // Append placeholder items if to is greater than the length of the list
+    if to > list.len() {
+        result.extend((0..to - list.len()).map(|_| T::default())); // Using T::default() for placeholders
+    }
+
+    result
 }

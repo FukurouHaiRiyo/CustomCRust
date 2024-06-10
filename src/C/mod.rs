@@ -1,4 +1,4 @@
-pub mod abs;
+pub mod math;
 pub mod c_func;
 pub mod aliquot_sum;
 pub mod amicable_nums;

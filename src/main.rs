@@ -1,7 +1,7 @@
 mod C;
 
-use C::c_func::{atoi, is_digit, substr, strcat, NameOf};
-use C::abs::abs;
+use C::c_func::{atoi, is_digit, substr, strcat, NameOf, sublist};
+use C::math::abs;
 
 fn main() {
     // test for atoi
@@ -28,4 +28,8 @@ fn main() {
 
     // test for name_of()
     println!("{}", (&s2).name_of());
+
+    // test for sublist
+    let list = vec![1, 2, 3, 4, 5];
+    println!("{:?}", sublist(&list, 2, 4));
 }
