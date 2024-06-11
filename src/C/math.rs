@@ -1,4 +1,6 @@
 use crate::C::num_traits::identities::Zero;
+extern crate num_complex;
+use num_complex::Complex;
 
 // Return the abolute value of a number
 pub fn abs<T>(num: T) -> T where T: std::ops::Neg<Output = T> + PartialOrd + Copy + Zero, {
@@ -67,5 +69,9 @@ pub fn natural_log(x: f64) -> f64 {
     } else {
         f64::NAN // logarithm is not defined for non-postive numbers
     }
+}
+
+pub fn real_part<T>(complex: &Complex<T>) -> &T {
+    &complex.re
 }
  
