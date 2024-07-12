@@ -1,8 +1,10 @@
 mod C;
 
 use C::c_func::{atoi, is_digit, substr, strcat, NameOf, sublist, sort};
-use C::math::{abs, sin, floor, ceil, natural_log};
+use C::math::{abs, sin, floor, ceil, natural_log, real_part};
 use C::listcat;
+extern crate num_complex;
+use num_complex::Complex;
 
 fn main() {
     /* 
@@ -53,8 +55,12 @@ fn main() {
     println!("Array after sorting: {:?}", numbers);*/ 
 
     // test for floor
-    let numbers = vec![3.7, -3.7, 4.0, -4.0, 0.0, -0.9];
+    /* let numbers = vec![3.7, -3.7, 4.0, -4.0, 0.0, -0.9];
     for number in numbers {
         println!("The floor of {} is {} and the ceil is {} and the log is {}", number, floor(number), ceil(number), natural_log(number));
-    }
+    } */
+
+    // test for real_part
+    let complex_num = Complex::new(3.0, 4.0);
+    println!("The real part of the complex number is: {}", real_part(&complex_num));
 }
