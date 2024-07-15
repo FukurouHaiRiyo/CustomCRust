@@ -247,5 +247,11 @@ pub fn aes_encrypt(plain_text: &[Byte], key: AesKey) -> Vec<Byte> {
     for round in 1..num_rounds {
         sub_bytes_blocks(&mut data, AesMode::Encryption);
         shift_rows_blocks(&mut data, AesMode::Encryption);
+        mix_column_blocks(&mut data, AesMode::Encryption);
+
+        let round_key = &round_key[round * AES_BLOCK_SIZE..(round + 1) * AES_BLOCK_SIZE];
+        add_round_key(&mut data, round_key);
     }
+
+    
 }
