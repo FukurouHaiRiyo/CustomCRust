@@ -57,7 +57,6 @@ pub fn is_digit(c: char) -> bool {
 }
 
 fn is_print(c: i32) -> bool {
-
     c >= 32 && c <= 126
 }
 

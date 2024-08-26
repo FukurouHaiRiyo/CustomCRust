@@ -231,6 +231,17 @@ enum AesMode{
     Decryption,
 }
 
+fn add_round_key(data: &mut [Byte], round_key: &[Byte]) {
+    assert!(data.len() % AES_BLOCK_SIZE == 0 && round_key.len() == AES_BLOCK_SIZE);
+    let num_blocks = data.len() / AES_BLOCK_SIZE;
+
+    data.iter_mut().zip(round_key.repeat(num_blocks)).for_each(|(s, k)| *s = ^k);
+}
+
+fn sub_bytes_blocks(data: &[Byte], mode: AesMode) {
+    
+}
+
 pub fn aes_encrypt(plain_text: &[Byte], key: AesKey) -> Vec<Byte> {
     let (key, num_rounds) = match key {
         AesKey::AesKey128(key) => (Vec::from(key), 10),
@@ -261,4 +272,25 @@ pub fn aes_encrypt(plain_text: &[Byte], key: AesKey) -> Vec<Byte> {
     data
 }
 
+fn key_expansion(init_key: &[Byte], num_rounds: usize) -> Vec<Byte> {
+    let nr = num_rounds;
 
+    // number of words in initial key
+    let nk = init_key.len() / AES_WORD_SIZE;
+    let nb = AES_NUM_BLOCK_WORDS;
+
+    let key = init_key.chunks(AES_WORD_SIZE).map(bytes_to_word).collect::<Vec<Word>>();
+    let mut key = padding::<Word>(&key, nk * (nr + 1));
+
+    for i in nk..nb * (nr + 1) {
+        let mut temp_key = key[i - 1];
+        if i % nk == 0 {
+            temp_word = sub_word(rot_word(temp_word), AesMode::Encryption) ^ RCON[i / nk];
+        } else if nk > 6 && i % nk == 4 {
+            temp_word = sub_word(temp_word, AesMode::Encryption);
+        }
+        key[i] = key[i - nk] ^ temp_word;
+    }
+
+    key.iter().map(|&w| word_to_bytes(w)).collect::<Vec<AesWord>>().concat()
+}
