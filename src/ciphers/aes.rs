@@ -1,11 +1,11 @@
 const AES_WORD_SIZE: usize = 4;
 const AES_BLOCK_SIZE: usize = 16;
-const AES_NUM_BLOCK_WORDS: usize = AES_BLOCK_SIZE / AES_WORD_SIZE
+const AES_NUM_BLOCK_WORDS: usize = AES_BLOCK_SIZE / AES_WORD_SIZE;
 
 type Byte = u8;
 type Word = u32;
 
-type AesWord = [Byte, AES_WORD_SIZE];
+type AesWord = [Byte; AES_WORD_SIZE];
 
 /// Precalculated values for x to the power of 2 in Rijndaels galois field.
 /// Used as 'RCON' during the key expansion.
@@ -219,6 +219,7 @@ const GF_MUL_TABLE: [[Byte; 256]; 16] = [
     /* F */ [0u8; 256],
 ];
 
+#[derive(Debug)]
 pub enum AesKey {
     AesKey128([Byte; 16]),
     AesKey192([Byte; 24]),
@@ -226,20 +227,9 @@ pub enum AesKey {
 }
 
 #[derive(Clone, Copy)]
-enum AesMode{
+enum AesMode {
     Encryption,
     Decryption,
-}
-
-fn add_round_key(data: &mut [Byte], round_key: &[Byte]) {
-    assert!(data.len() % AES_BLOCK_SIZE == 0 && round_key.len() == AES_BLOCK_SIZE);
-    let num_blocks = data.len() / AES_BLOCK_SIZE;
-
-    data.iter_mut().zip(round_key.repeat(num_blocks)).for_each(|(s, k)| *s = ^k);
-}
-
-fn sub_bytes_blocks(data: &[Byte], mode: AesMode) {
-    
 }
 
 pub fn aes_encrypt(plain_text: &[Byte], key: AesKey) -> Vec<Byte> {
@@ -249,7 +239,7 @@ pub fn aes_encrypt(plain_text: &[Byte], key: AesKey) -> Vec<Byte> {
         AesKey::AesKey256(key) => (Vec::from(key), 14),
     };
 
-    let round_keys = key_expansion(&key, nu_rounds);
+    let round_keys = key_expansion(&key, num_rounds);
     let mut data = padding::<Byte>(plain_text, AES_BLOCK_SIZE);
 
     let round_key = &round_keys[0..AES_BLOCK_SIZE];
@@ -259,8 +249,7 @@ pub fn aes_encrypt(plain_text: &[Byte], key: AesKey) -> Vec<Byte> {
         sub_bytes_blocks(&mut data, AesMode::Encryption);
         shift_rows_blocks(&mut data, AesMode::Encryption);
         mix_column_blocks(&mut data, AesMode::Encryption);
-
-        let round_key = &round_key[round * AES_BLOCK_SIZE..(round + 1) * AES_BLOCK_SIZE];
+        let round_key = &round_keys[round * AES_BLOCK_SIZE..(round + 1) * AES_BLOCK_SIZE];
         add_round_key(&mut data, round_key);
     }
 
@@ -272,18 +261,49 @@ pub fn aes_encrypt(plain_text: &[Byte], key: AesKey) -> Vec<Byte> {
     data
 }
 
+pub fn aes_decrypt(cipher_text: &[Byte], key: AesKey) -> Vec<Byte> {
+    let (key, num_rounds) = match key {
+        AesKey::AesKey128(key) => (Vec::from(key), 10),
+        AesKey::AesKey192(key) => (Vec::from(key), 12),
+        AesKey::AesKey256(key) => (Vec::from(key), 14),
+    };
+
+    let round_keys = key_expansion(&key, num_rounds);
+    let mut data = padding::<Byte>(cipher_text, AES_BLOCK_SIZE);
+
+    let round_key = &round_keys[num_rounds * AES_BLOCK_SIZE..(num_rounds + 1) * AES_BLOCK_SIZE];
+    add_round_key(&mut data, round_key);
+    shift_rows_blocks(&mut data, AesMode::Decryption);
+    sub_bytes_blocks(&mut data, AesMode::Decryption);
+
+    for round in (1..num_rounds).rev() {
+        let round_key = &round_keys[round * AES_BLOCK_SIZE..(round + 1) * AES_BLOCK_SIZE];
+        add_round_key(&mut data, round_key);
+        mix_column_blocks(&mut data, AesMode::Decryption);
+        shift_rows_blocks(&mut data, AesMode::Decryption);
+        sub_bytes_blocks(&mut data, AesMode::Decryption);
+    }
+
+    let round_key = &round_keys[0..AES_BLOCK_SIZE];
+    add_round_key(&mut data, round_key);
+
+    data
+}
+
 fn key_expansion(init_key: &[Byte], num_rounds: usize) -> Vec<Byte> {
     let nr = num_rounds;
-
     // number of words in initial key
     let nk = init_key.len() / AES_WORD_SIZE;
     let nb = AES_NUM_BLOCK_WORDS;
 
-    let key = init_key.chunks(AES_WORD_SIZE).map(bytes_to_word).collect::<Vec<Word>>();
+    let key = init_key
+        .chunks(AES_WORD_SIZE)
+        .map(bytes_to_word)
+        .collect::<Vec<Word>>();
     let mut key = padding::<Word>(&key, nk * (nr + 1));
 
     for i in nk..nb * (nr + 1) {
-        let mut temp_key = key[i - 1];
+        let mut temp_word = key[i - 1];
         if i % nk == 0 {
             temp_word = sub_word(rot_word(temp_word), AesMode::Encryption) ^ RCON[i / nk];
         } else if nk > 6 && i % nk == 4 {
@@ -292,5 +312,234 @@ fn key_expansion(init_key: &[Byte], num_rounds: usize) -> Vec<Byte> {
         key[i] = key[i - nk] ^ temp_word;
     }
 
-    key.iter().map(|&w| word_to_bytes(w)).collect::<Vec<AesWord>>().concat()
+    key.iter()
+        .map(|&w| word_to_bytes(w))
+        .collect::<Vec<AesWord>>()
+        .concat()
+}
+
+fn add_round_key(data: &mut [Byte], round_key: &[Byte]) {
+    assert!(data.len() % AES_BLOCK_SIZE == 0 && round_key.len() == AES_BLOCK_SIZE);
+    let num_blocks = data.len() / AES_BLOCK_SIZE;
+    data.iter_mut()
+        .zip(round_key.repeat(num_blocks))
+        .for_each(|(s, k)| *s ^= k);
+}
+
+fn sub_bytes_blocks(data: &mut [Byte], mode: AesMode) {
+    for block in data.chunks_mut(AES_BLOCK_SIZE) {
+        sub_bytes(block, mode);
+    }
+}
+
+fn shift_rows_blocks(blocks: &mut [Byte], mode: AesMode) {
+    for block in blocks.chunks_mut(AES_BLOCK_SIZE) {
+        transpose_block(block);
+        shift_rows(block, mode);
+        transpose_block(block);
+    }
+}
+
+fn mix_column_blocks(data: &mut [Byte], mode: AesMode) {
+    for block in data.chunks_mut(AES_BLOCK_SIZE) {
+        transpose_block(block);
+        mix_column(block, mode);
+        transpose_block(block);
+    }
+}
+
+fn padding<T: Clone + Default>(data: &[T], block_size: usize) -> Vec<T> {
+    if data.len() % block_size == 0 {
+        Vec::from(data)
+    } else {
+        let num_blocks = data.len() / block_size + 1;
+        let mut padded = Vec::from(data);
+        padded.append(&mut vec![
+            T::default();
+            num_blocks * block_size - data.len()
+        ]);
+        padded
+    }
+}
+
+fn sub_word(word: Word, mode: AesMode) -> Word {
+    let mut bytes = word_to_bytes(word);
+    sub_bytes(&mut bytes, mode);
+    bytes_to_word(&bytes)
+}
+
+fn sub_bytes(data: &mut [Byte], mode: AesMode) {
+    let sbox = match mode {
+        AesMode::Encryption => &SBOX,
+        AesMode::Decryption => &INV_SBOX,
+    };
+    for data_byte in data {
+        *data_byte = sbox[*data_byte as usize];
+    }
+}
+
+fn shift_rows(block: &mut [Byte], mode: AesMode) {
+    // skip the first row, index begin from 1
+    for row in 1..4 {
+        let mut row_word: AesWord = [0u8; 4];
+        row_word.copy_from_slice(&block[row * 4..row * 4 + 4]);
+        for col in 0..4 {
+            block[row * 4 + col] = match mode {
+                AesMode::Encryption => row_word[(col + row) % 4],
+                AesMode::Decryption => row_word[(col + 4 - row) % 4],
+            }
+        }
+    }
+}
+
+fn mix_column(block: &mut [Byte], mode: AesMode) {
+    let mix_col_mat = match mode {
+        AesMode::Encryption => [
+            [0x02, 0x03, 0x01, 0x01],
+            [0x01, 0x02, 0x03, 0x01],
+            [0x01, 0x01, 0x02, 0x03],
+            [0x03, 0x01, 0x01, 0x02],
+        ],
+        AesMode::Decryption => [
+            [0x0e, 0x0b, 0x0d, 0x09],
+            [0x09, 0x0e, 0x0b, 0x0d],
+            [0x0d, 0x09, 0x0e, 0x0b],
+            [0x0b, 0x0d, 0x09, 0x0e],
+        ],
+    };
+
+    for col in 0..4 {
+        let col_word = block
+            .iter()
+            .zip(0..AES_BLOCK_SIZE)
+            .filter_map(|(&x, i)| if i % 4 == col { Some(x) } else { None })
+            .collect::<Vec<u8>>();
+        for row in 0..4 {
+            let mut word = 0;
+            for i in 0..4 {
+                word ^= GF_MUL_TABLE[mix_col_mat[row][i]][col_word[i] as usize] as Word
+            }
+            block[row * 4 + col] = word as Byte;
+        }
+    }
+}
+
+fn transpose_block(block: &mut [u8]) {
+    let mut src_block = [0u8; AES_BLOCK_SIZE];
+    src_block.copy_from_slice(block);
+    for row in 0..4 {
+        for col in 0..4 {
+            block[row * 4 + col] = src_block[col * 4 + row];
+        }
+    }
+}
+
+fn bytes_to_word(bytes: &[Byte]) -> Word {
+    assert!(bytes.len() == AES_WORD_SIZE);
+    let mut word = 0;
+    for (i, &byte) in bytes.iter().enumerate() {
+        word |= (byte as Word) << (8 * i);
+    }
+    word
+}
+
+fn word_to_bytes(word: Word) -> AesWord {
+    let mut bytes = [0; AES_WORD_SIZE];
+    for (i, byte) in bytes.iter_mut().enumerate() {
+        let bits_shift = 8 * i;
+        *byte = ((word & (0xff << bits_shift)) >> bits_shift) as Byte;
+    }
+    bytes
+}
+
+fn rot_word(word: Word) -> Word {
+    let mut bytes = word_to_bytes(word);
+    let init = bytes[0];
+    bytes[0] = bytes[1];
+    bytes[1] = bytes[2];
+    bytes[2] = bytes[3];
+    bytes[3] = init;
+    bytes_to_word(&bytes)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_aes_128() {
+        let plain: [u8; 16] = [
+            0x32, 0x43, 0xf6, 0xa8, 0x88, 0x5a, 0x30, 0x8d, 0x31, 0x31, 0x98, 0xa2, 0xe0, 0x37,
+            0x07, 0x34,
+        ];
+        let key: [u8; 16] = [
+            0x2b, 0x7e, 0x15, 0x16, 0x28, 0xae, 0xd2, 0xa6, 0xab, 0xf7, 0x15, 0x88, 0x09, 0xcf,
+            0x4f, 0x3c,
+        ];
+        let cipher: [u8; 16] = [
+            0x39, 0x25, 0x84, 0x1d, 0x02, 0xdc, 0x09, 0xfb, 0xdc, 0x11, 0x85, 0x97, 0x19, 0x6a,
+            0x0b, 0x32,
+        ];
+        let encrypted = aes_encrypt(&plain, AesKey::AesKey128(key));
+        assert_eq!(cipher, encrypted[..]);
+        let decrypted = aes_decrypt(&encrypted, AesKey::AesKey128(key));
+        assert_eq!(plain, decrypted[..]);
+    }
+
+    #[test]
+    fn test_aes_192() {
+        let plain: [u8; 16] = [
+            0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd,
+            0xee, 0xff,
+        ];
+        let key: [u8; 24] = [
+            0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d,
+            0x0e, 0x0f, 0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17,
+        ];
+        let cipher: [u8; 16] = [
+            0xdd, 0xa9, 0x7c, 0xa4, 0x86, 0x4c, 0xdf, 0xe0, 0x6e, 0xaf, 0x70, 0xa0, 0xec, 0x0d,
+            0x71, 0x91,
+        ];
+        let encrypted = aes_encrypt(&plain, AesKey::AesKey192(key));
+        assert_eq!(cipher, encrypted[..]);
+        let decrypted = aes_decrypt(&encrypted, AesKey::AesKey192(key));
+        assert_eq!(plain, decrypted[..]);
+    }
+
+    #[test]
+    fn test_aes_256() {
+        let plain: [u8; 16] = [
+            0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd,
+            0xee, 0xff,
+        ];
+        let key: [u8; 32] = [
+            0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d,
+            0x0e, 0x0f, 0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b,
+            0x1c, 0x1d, 0x1e, 0x1f,
+        ];
+        let cipher: [u8; 16] = [
+            0x8e, 0xa2, 0xb7, 0xca, 0x51, 0x67, 0x45, 0xbf, 0xea, 0xfc, 0x49, 0x90, 0x4b, 0x49,
+            0x60, 0x89,
+        ];
+        let encrypted = aes_encrypt(&plain, AesKey::AesKey256(key));
+        assert_eq!(cipher, encrypted[..]);
+        let decrypted = aes_decrypt(&encrypted, AesKey::AesKey256(key));
+        assert_eq!(plain, decrypted[..]);
+    }
+
+    #[test]
+    fn test_str() {
+        let str = "Hello, cipher world!";
+        let plain = str.as_bytes();
+        let key = [
+            0x2b, 0x7e, 0x15, 0x16, 0x28, 0xae, 0xd2, 0xa6, 0xab, 0xf7, 0x15, 0x88, 0x09, 0xcf,
+            0x4f, 0x3c,
+        ];
+        let encrypted = aes_encrypt(plain, AesKey::AesKey128(key));
+        let decrypted = aes_decrypt(&encrypted, AesKey::AesKey128(key));
+        assert_eq!(
+            str,
+            String::from_utf8(decrypted).unwrap().trim_end_matches('\0')
+        );
+    }
 }

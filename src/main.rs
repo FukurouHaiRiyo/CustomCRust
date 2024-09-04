@@ -1,18 +1,17 @@
 mod C;
+mod ciphers;
 
 use C::c_func::{itoa, is_digit, substr, strcat, NameOf, sublist, sort};
 use C::math::{abs, sin, floor, ceil, natural_log, real_part};
 use C::listcat;
+use ciphers::aes;
 extern crate num_complex;
 use num_complex::Complex;
 
-use clap::{App, Subcommand};
-
 
 fn main() {
-    let matches = App::new("CLI Rust")
-                    .version("1.0")
-                    .author("Fufu <andreipanait00@gmail.com>")
-                    .about("C function and other utility functions written in Rust that can be run in CLI.")
-                    .args_from_usage("");
+    let key128: [u8; 16] = [0; 16]; // 16 bytes, all set to 0
+    let aes_key_128 = aes::AesKey::AesKey128(key128);
+
+    println!("{:?}", aes::aes_encrypt(b"Andrei", aes_key_128));
 }
