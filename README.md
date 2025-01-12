@@ -1,4 +1,4 @@
-# Rust printf implementation
+# Rust implementation for different C functions and libraries 
 
 The printf function is designed to replicate the behavior of the standard C library's printf function. It handles various format specifiers to print different types of data. The project involves practicing the use of variadic functions, specifically dealing with a variable number of argument
 
