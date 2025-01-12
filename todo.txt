@@ -1,0 +1,10 @@
+1. Create a list library similar to the one in C++. The list library will let me create a new list 
+(example: list<string> cars or list<int> numbers), it will let me create a list that will store variables, like strings or integers
+(example: list<string> cars = {"Volvo", "BMW", "Ford", "Mazda"};), it will let me print the list. 
+Also, it will have function like back() for accessing the last element in the list and front() to access the first element
+int the list. It will also have the functions .push_front() to insert an element at the beginning of the list and .push_back() to add an element at the end
+It will also have functions like .pop_front() to remove an element from the beginning of the list and .pop_back() to remove an element at the end
+The .size() function will find out how many elements a list has and the .empty() function to find out if a list is empty or not
+
+
+
