@@ -1,8 +1,10 @@
-mod List;
+pub mod List;
+mod Vector;
 
 use List::deque::Deque;
 use List::mem::Memory;
 use List::node::Node;
+use Vector::vec::Vec;
 
 
 fn main() {
@@ -13,41 +15,18 @@ fn main() {
         deque.push_back(&mut memory, i);
     }
     println!();
-    memory.debug_print();
     deque.debug_print(&memory);
 
-    for i in 10..20 {
-        deque.push_front(&mut memory, i);
-    }
-    println!();
-    memory.debug_print();
-    deque.debug_print(&memory);
+    // Create a new vector
+    let mut vec = Vec::new();
 
-    for _ in 0..20 {
-        deque.pop_front(&mut memory);
-    }
-    println!();
-    memory.debug_print();
-    deque.debug_print(&memory);
+    // Push elements into the vector
+    vec.push(10);
+    vec.push(20);
+    vec.push(30);
 
-    for i in 0..10 {
-        deque.push_back(&mut memory, i);
-    }
-    println!();
-    memory.debug_print();
-    deque.debug_print(&memory);
+    // Print the vector's length and capacity
+    println!("Length of vector: {}", vec.len());
+    println!("Capacity of vector: {}", vec.capacity());
 
-    for i in 0..10 {
-        deque.push_front(&mut memory, i);
-    }
-    println!();
-    memory.debug_print();
-    deque.debug_print(&memory);
-
-    for i in 0..10 {
-        deque.push_front(&mut memory, i);
-    }
-    println!();
-    memory.debug_print();
-    deque.debug_print(&memory);
 }

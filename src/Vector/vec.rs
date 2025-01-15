@@ -34,7 +34,7 @@ impl<T> Vec<T> {
     /// Removes and returns the last element of the vector
     /// Return 'None' if the vector is empty.
     pub fn pop(&mut self) -> Option<T> {
-        if self.len == { 
+        if self.len == 0 { 
             return None; // No elements to remove
         }
 

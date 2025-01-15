@@ -49,23 +49,23 @@ impl <T> RawVec<T> {
         } else {
             let old_layout = Layout::array::<T>(self.cap).unwrap();
             let old_ptr = self.ptr.as_ptr() as *mut u8;
-            unsafe { alloc::realloc(old_ptr, old_layout, new_layout,size()) } // resize allocation
+            unsafe { alloc::realloc(old_ptr, old_layout, new_layout.size()) } // resize allocation
         };
 
         // Update the pointer and capacity
         self.ptr = match NonNull::new(new_ptr as *mut T) {
             Some(p) => p,
             None => alloc::handle_alloc_error(new_layout),
-        };;
+        };
         self.cap = new_cap;
     }
 }
 
-impl<T> Drop fro RawVect<T> {
+impl<T> Drop for RawVec<T> {
     /// Deallocates the memory used by the 'RawVec'.
     /// This is only performed if the capacity if non-zero and the element type is not zero-sized.
     fn drop(&mut self) {
-        if self.cap != 0 && mem::size_of::<T> != 0 {
+        if self.cap != 0 && mem::size_of::<T>() != 0 {
             unsafe { 
                 alloc::dealloc(
                     self.ptr.as_ptr() as *mut u8, // Convert to raw byte pointer

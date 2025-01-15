@@ -7,4 +7,9 @@ It will also have functions like .pop_front() to remove an element from the begi
 The .size() function will find out how many elements a list has and the .empty() function to find out if a list is empty or not
 
 
+2. Create a vector library, similar to the one in C/C++
 
+3. Implement <climits> (limits.h), similar to the one in C/C++: 
+    This header defines constants with the limits of fundamental integral types for the specific system and compiler implementation used.
+    The limits for fundamental floating-point types are defined in <cfloat> (<float.h>).
+    The limits for width-specific integral types and other typedef types are defined in <cstdint> (<stdint.h>).
